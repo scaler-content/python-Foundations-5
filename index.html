@@ -1,0 +1,647 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Class 5 Post-Read · Functions</title>
+<style>
+:root{
+  --stock:#E7E0CC;--stock-face:#FBF8EF;--ink:#2B2620;--ink-soft:#5B5347;
+  --tab-red:#A8382E;--tab-teal:#3E6E62;--tab-mustard:#B8842A;
+  --line:#D8CFB4;--good:#3E6E62;--bad:#A8382E;--shadow:3px 4px 0 rgba(43,38,32,.14);
+}
+*{box-sizing:border-box} html{scroll-behavior:smooth}
+body{margin:0;background:var(--stock);background-image:radial-gradient(rgba(43,38,32,.03) 1px,transparent 1px);background-size:14px 14px;color:var(--ink);font-family:Arial,sans-serif;line-height:1.55;padding:0 0 80px}
+code,.mono,pre{font-family:"Courier New",monospace}
+h1,h2,h3,.tab-label{font-family:Georgia,serif;font-weight:400}
+.wrap{max-width:720px;margin:0 auto;padding:0 20px}
+header.masthead{padding:52px 20px 28px;max-width:720px;margin:0 auto}
+.kicker{font-family:"Courier New",monospace;font-size:.78rem;color:var(--ink-soft);margin:0 0 10px}
+h1{font-size:2.1rem;margin:0 0 6px;line-height:1.25}
+.sub{color:var(--ink-soft);font-size:1.02rem;max-width:56ch;margin:0}
+.legend{display:flex;flex-wrap:wrap;gap:10px 18px;margin:22px 0 0;padding:14px 16px;background:var(--stock-face);border:1px solid var(--line);font-size:.86rem;color:var(--ink-soft)}
+.scope{margin:34px auto 46px;max-width:720px;padding:20px 20px 20px 22px;background:var(--stock-face);border-left:5px solid var(--tab-red);box-shadow:var(--shadow)}
+.scope h2{font-size:1rem;margin:0 0 8px;color:var(--tab-red)} .scope p{margin:0}
+.card{position:relative;max-width:720px;margin:0 auto 40px;background:var(--stock-face);border:1px solid var(--line);box-shadow:var(--shadow)}
+.card-tab{position:absolute;top:-16px;left:24px;padding:5px 12px;color:#fff;font-size:.82rem;font-family:"Courier New",monospace;box-shadow:2px 2px 0 rgba(43,38,32,.18)}
+.card-body{padding:34px 26px 26px}.card h3{font-size:1.28rem;margin:0 0 14px}.card p{margin:0 0 14px}
+.analogy,.takeaway,.note{padding:14px 16px;margin:16px 0;font-size:.95rem}
+.analogy{background:#F2ECD8;border:1px dashed var(--tab-mustard)}
+.analogy .label,.takeaway .label,.note .label{font-weight:600;font-size:.8rem;font-family:"Courier New",monospace;margin-bottom:4px;display:block}
+.analogy .label{color:var(--tab-mustard)} .takeaway{background:#EAF1EE;border-left:4px solid var(--tab-teal)}
+.takeaway .label{color:var(--tab-teal)} .note{background:#F6E9E7;border-left:4px solid var(--tab-red)}
+.note .label{color:var(--tab-red)}
+pre{background:#26221D;color:#EDE6D2;padding:14px 16px;overflow-x:auto;font-size:.88rem;margin:14px 0;line-height:1.5}
+pre .out{color:#8FBBA9}
+details.predict{margin:16px 0;border:1px solid var(--line);background:#fff}
+details.predict summary{cursor:pointer;padding:12px 14px;font-family:"Courier New",monospace;font-size:.88rem;color:var(--tab-teal);list-style:none}
+details.predict summary::-webkit-details-marker{display:none}
+details.predict summary:before{content:"▸";margin-right:8px} details.predict[open] summary:before{content:"▾"}
+details.predict .reveal{padding:0 14px 16px;border-top:1px solid var(--line);padding-top:12px}
+table{width:100%;border-collapse:collapse;margin:16px 0;font-size:.92rem}
+th,td{text-align:left;padding:9px 10px;border-bottom:1px solid var(--line);vertical-align:top}
+th{font-family:"Courier New",monospace;font-size:.78rem;color:var(--ink-soft);font-weight:600;border-bottom:2px solid var(--ink)}
+.vote-box{border:1px solid var(--line);background:#fff;padding:16px;margin:16px 0}
+.vote-btns,.choice-btns{display:flex;gap:10px;margin:10px 0;flex-wrap:wrap}
+.vote-btns button,.choice-btns button{flex:1;min-width:100px;font-family:"Courier New",monospace;padding:10px;background:var(--stock);border:1px solid var(--ink);cursor:pointer}
+.vote-btns button:hover,.choice-btns button:hover{background:var(--ink);color:var(--stock-face)}
+.vote-tally{font-size:.82rem;color:var(--ink-soft);font-family:"Courier New",monospace}
+.vote-result{display:none;margin-top:12px}.vote-result.show{display:block}
+.terms-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px;margin-top:8px}
+.flip{perspective:800px;height:110px;cursor:pointer}.flip-inner{position:relative;width:100%;height:100%;transition:transform .5s;transform-style:preserve-3d}
+.flip.flipped .flip-inner{transform:rotateY(180deg)}
+.flip-face{position:absolute;width:100%;height:100%;backface-visibility:hidden;border:1px solid var(--ink);display:flex;align-items:center;justify-content:center;text-align:center;padding:10px;font-size:.85rem}
+.flip-front{background:var(--stock-face);font-family:"Courier New",monospace;font-weight:600}
+.flip-back{background:var(--ink);color:var(--stock-face);transform:rotateY(180deg);font-size:.76rem;line-height:1.4}
+.feedback{display:none;margin-top:10px;padding:9px 11px}.feedback.show{display:block}
+.feedback.correct{background:#EAF1EE;color:var(--good);border-left:3px solid var(--good)}
+.feedback.wrong{background:#F6E9E7;color:var(--bad);border-left:3px solid var(--bad)}
+.trace{width:100%;border-collapse:collapse}.trace td{padding:7px 9px}.trace td:last-child{text-align:right;font-family:"Courier New",monospace;font-weight:600}
+.mental{background:#26221D;color:#EDE6D2;padding:16px;font-family:"Courier New",monospace;font-size:.82rem;line-height:1.5;white-space:pre;overflow-x:auto;margin:16px 0;text-align:center}
+footer{text-align:center;max-width:720px;margin:20px auto;color:var(--ink-soft);font-size:.84rem}
+@media(max-width:600px){h1{font-size:1.6rem}.card-body{padding:30px 18px 20px}.vote-btns button{min-width:0}.mental{font-size:.72rem}}
+</style>
+</head>
+<body>
+
+<header class="masthead">
+  <p class="kicker">DSML · Post-Read · Class 5</p>
+  <h1>Functions</h1>
+  <p class="sub">A card-by-card walkthrough to lock in defining and calling functions, parameters vs. arguments, <code>return</code>, scope, default/keyword arguments, and lambda — the pieces that let you package logic into reusable blocks.</p>
+  <div class="legend">
+    <span>🔮 predict before revealing</span><span>💬 debrief</span><span>🤖 AI moment</span><span>✅ takeaway</span>
+  </div>
+</header>
+
+<div class="scope">
+  <h2>What this post-read covers</h2>
+  <p>Why functions matter; defining vs. calling; parameters and arguments; <code>return</code> vs. <code>print()</code>; scope (local vs. global); default and keyword arguments; lambda functions; and three cumulative practice problems.</p>
+</div>
+
+<div class="wrap">
+
+<div class="card">
+<div class="card-tab" style="background:var(--tab-red)">01 · the idea</div><div class="card-body">
+<h3>What if we need the same logic more than once?</h3>
+<p>By now you know variables, data types, operators, conditions, and loops. But in a larger program, the same piece of logic often needs to run again and again in different places.</p>
+<details class="predict"><summary>🔮 Before you reveal: if you needed to display the same message in 20 different places in your program, would you copy-paste <code>print()</code> 20 times?</summary><div class="reveal">
+<pre>print("Welcome to Python!")
+print("Welcome to Python!")
+print("Welcome to Python!")</pre>
+<p>Repeating the same line works, but it doesn't scale — and if the message ever changes, you'd have to update it everywhere. This is exactly the problem <strong>functions</strong> solve.</p>
+</div></details>
+<div class="analogy"><span class="label">Mental model</span>A function is a small machine: give it something → it processes it → it possibly hands something back.</div>
+<pre>def welcome():
+    print("Welcome to Python!")
+
+welcome()
+welcome()
+welcome()</pre>
+<div class="takeaway"><span class="label">✅ Takeaway</span>A function is a reusable block of code that performs a specific task, written once and used wherever you need it.</div>
+</div></div>
+
+<div class="card">
+<div class="card-tab" style="background:var(--tab-teal)">02 · defining a function</div><div class="card-body">
+<h3>The basic syntax</h3>
+<pre>def function_name():
+    # code</pre>
+<pre>def greet():
+    print("Hello!")</pre>
+<table><tr><th>Piece</th><th>What it does</th></tr>
+<tr><td><code>def</code></td><td>Tells Python you're defining a function.</td></tr>
+<tr><td><code>greet</code></td><td>The function's name.</td></tr>
+<tr><td><code>()</code></td><td>Where parameters, if any, are placed.</td></tr>
+<tr><td><code>:</code></td><td>Starts the function body.</td></tr>
+<tr><td>Indentation</td><td>Marks which code belongs to the function.</td></tr>
+</table>
+</div></div>
+
+<div class="card">
+<div class="card-tab" style="background:var(--tab-mustard)">03 · defining vs. calling</div><div class="card-body">
+<h3>Does anything happen just from defining it?</h3>
+<details class="predict"><summary>🔮 Predict before revealing: if you run only this definition — no call anywhere — does anything print?</summary><div class="reveal">
+<pre>def greet():
+    print("Hello!")</pre>
+<p><strong>Nothing is printed yet.</strong> Defining a function is like drawing a blueprint — it describes what should happen, but nothing runs until you actually use it.</p>
+</div></details>
+<p>To make the code inside actually run, you have to <strong>call</strong> the function:</p>
+<pre>greet()
+
+<span class="out">Hello!</span></pre>
+<div class="takeaway"><span class="label">✅ Takeaway</span>Defining a function only creates the plan. The code inside only runs when the function is called.</div>
+</div></div>
+
+<div class="card">
+<div class="card-tab" style="background:var(--tab-red)">04 · function flow</div><div class="card-body">
+<h3>The life of a function call</h3>
+<div class="mental">Define Function
+      ↓
+   Function
+    exists
+      ↓
+ Call Function
+      ↓
+Python executes
+the function body
+      ↓
+   Function ends</div>
+<div class="takeaway"><span class="label">✅ Takeaway</span>A function exists as soon as it's defined, but it only runs — start to finish — each time it's called.</div>
+</div></div>
+
+<div class="card">
+<div class="card-tab" style="background:var(--tab-teal)">05 · parameters &amp; arguments</div><div class="card-body">
+<h3>Giving a function information</h3>
+<p>A function becomes far more useful when we can hand it information instead of hard-coding it:</p>
+<details class="predict"><summary>🔮 Predict before revealing: what will all three calls print?</summary><div class="reveal">
+<pre>def greet(name):
+    print("Hello", name)
+
+greet("Asha")
+greet("Rahul")
+greet("Priya")
+
+<span class="out">Hello Asha
+Hello Rahul
+Hello Priya</span></pre>
+</div></details>
+<p><code>name</code> is a <strong>parameter</strong> — the variable listed in the function's definition. <code>"Asha"</code> is the <strong>argument</strong> — the actual value supplied when the function is called.</p>
+<p>The same idea extends to multiple parameters, matched to arguments by position:</p>
+<pre>def introduce(name, age):
+    print("My name is", name)
+    print("I am", age, "years old.")
+
+introduce("Asha", 20)
+
+<span class="out">My name is Asha
+I am 20 years old.</span></pre>
+<div class="takeaway"><span class="label">✅ Takeaway</span>Parameter = the variable name in the definition. Argument = the actual value given at the call. With multiple parameters, values are assigned in order.</div>
+</div></div>
+
+<div class="card">
+<div class="card-tab" style="background:var(--tab-mustard)">06 · functions + everything else</div><div class="card-body">
+<h3>Functions don't replace what you already know — they organize it</h3>
+<p>A function can contain any of the concepts from earlier classes:</p>
+<table><tr><th>Concept</th><th>Inside a function</th></tr>
+<tr><td>Variables</td><td><code>def square(number): result = number * number; print(result)</code></td></tr>
+<tr><td>Operators</td><td><code>def add(a, b): print(a + b)</code></td></tr>
+<tr><td>Conditions</td><td><code>def check_age(age): if age >= 18: print("Adult") else: print("Minor")</code></td></tr>
+<tr><td>Loops</td><td><code>def print_numbers(): for i in range(1, 6): print(i)</code></td></tr>
+</table>
+<div class="takeaway"><span class="label">✅ Takeaway</span>A function doesn't replace variables, operators, conditions, or loops — it gives you a way to package them into a reusable piece.</div>
+</div></div>
+
+<div class="card">
+<div class="card-tab" style="background:var(--tab-red)">07 · the return statement</div><div class="card-body">
+<h3>Printing something and returning something are different</h3>
+<pre>def add(a, b):
+    print(a + b)
+
+result = add(10, 20)</pre>
+<p>This displays the answer — but what if we want to <em>use</em> that answer somewhere else in the program? We need the function to hand the result back. That's what <code>return</code> does:</p>
+<pre>def add(a, b):
+    return a + b
+
+result = add(10, 20)
+print(result)
+
+<span class="out">30</span></pre>
+<div class="takeaway"><span class="label">✅ Takeaway</span><code>return</code> sends a value back to whoever called the function, so it can be stored and reused.</div>
+</div></div>
+
+<div class="card">
+<div class="card-tab" style="background:var(--tab-teal)">08 · print() vs. return — the vote</div><div class="card-body">
+<h3>This is the single most common real-world bug beginners write</h3>
+<div class="vote-box">
+<p><strong>What will <code>result</code> end up as?</strong></p>
+<pre>def add(a, b):
+    print(a + b)
+
+result = add(10, 20)
+
+print(result)</pre>
+<div class="vote-btns"><button type="button" onclick="resultVote('30')">30</button><button type="button" onclick="resultVote('none')">None</button><button type="button" onclick="resultVote('error')">An error</button></div>
+<p class="vote-tally" id="resultTally"></p><div class="vote-result" id="resultResult">
+<p>💬 The output is:</p>
+<pre>30
+<span class="out">None</span></pre>
+<p><code>add(10, 20)</code> prints 30 — but that <code>print()</code> happens <em>inside</em> the function, purely as a side effect. The function itself never uses <code>return</code>, so it hands nothing back to whoever called it. Python's default answer for "what does this function give back?" is <code>None</code>. So <code>result</code> doesn't hold 30 — it holds <code>None</code>, and that's what the second <code>print()</code> shows.</p>
+</div></div>
+<p>Avoid thinking "<code>return</code> prints the result." Instead: <code>print()</code> is for the human watching the screen; <code>return</code> is for the rest of your program to use.</p>
+<div class="note"><span class="label">🤖 AI moment</span>If you guessed 30, paste this into a general-purpose AI assistant: <em>"I expected result to be 30 here, but it's None. Walk me through exactly why, step by step."</em> Then independently verify by adding <code>return a + b</code> to the function yourself, re-running it, and confirming <code>result</code> now holds 30 instead of <code>None</code>.</div>
+</div></div>
+
+<div class="card">
+<div class="card-tab" style="background:var(--tab-mustard)">09 · return unlocks reuse</div><div class="card-body">
+<h3>A returned value can be used, not just displayed</h3>
+<details class="predict"><summary>🔮 Predict the output before revealing</summary><div class="reveal">
+<pre>def square(number):
+    return number * number
+
+x = square(5)
+print(x)
+
+<span class="out">25</span></pre>
+</div></details>
+<p>Because <code>square()</code> returns a value, it can be used directly, or even inside a larger calculation:</p>
+<pre>print(square(5))
+
+<span class="out">25</span></pre>
+<pre>result = square(5) + 10
+print(result)
+
+<span class="out">35</span></pre>
+<details class="predict"><summary>🔮 Three lines are inside this function. How many actually run?</summary><div class="reveal">
+<pre>def test():
+    print("Start")
+    return 10
+    print("End")
+
+test()
+
+<span class="out">Start</span></pre>
+<p>Only two — the third is unreachable. As soon as Python reaches <code>return</code>, the function finishes immediately. <code>"End"</code> is never printed because the function has already returned.</p>
+</div></details>
+<div class="takeaway"><span class="label">✅ Takeaway</span>A returned value can be stored, printed, or used inside another expression. <code>return</code> also exits the function immediately — any code after it never runs.</div>
+</div></div>
+
+<div class="card">
+<div class="card-tab" style="background:var(--tab-red)">10 · functions without return</div><div class="card-body">
+<h3>Not every function needs to hand something back</h3>
+<pre>def greet(name):
+    print("Hello", name)</pre>
+<p>This is perfectly valid — the function performs an action but doesn't explicitly return a useful value. The rule of thumb: use <code>print()</code> when the goal is to display something; use <code>return</code> when the result needs to be used elsewhere.</p>
+</div></div>
+
+<div class="card">
+<div class="card-tab" style="background:var(--tab-teal)">11 · scope: local vs. global</div><div class="card-body">
+<h3>Where can a variable actually be accessed?</h3>
+<details class="predict"><summary>🔮 <code>message</code> was created while <code>greet()</code> ran — will it still be around once the function finishes?</summary><div class="reveal">
+<pre>def greet():
+    message = "Hello"
+
+greet()
+
+print(message)
+
+<span class="out">NameError: name 'message' is not defined</span></pre>
+<p><code>message</code> is a <strong>local variable</strong> — created inside the function, it normally exists only within that function, and disappears once the function ends.</p>
+</div></details>
+<details class="predict"><summary>🔮 Unlike the previous example, will this work or fail? What's different this time?</summary><div class="reveal">
+<pre>name = "Asha"
+
+def greet():
+    print(name)
+
+greet()
+
+<span class="out">Asha</span></pre>
+<p>This works. <code>name</code> is a <strong>global variable</strong> — created outside any function — and a function can read a global variable even though it can't read another function's local one.</p>
+</div></details>
+<div class="mental">Outside Function
+       ↓
+   Global Scope
+       │
+       │ can be accessed
+       ↓
+    Function
+
+
+Inside Function
+       ↓
+   Local Scope
+       ↓
+Usually available
+only inside function</div>
+<div class="takeaway"><span class="label">✅ Takeaway</span>For this course: prefer local variables inside functions whenever possible, instead of creating many global variables — global variables can make larger programs harder to understand and maintain.</div>
+</div></div>
+
+<div class="card">
+<div class="card-tab" style="background:var(--tab-mustard)">12 · default arguments</div><div class="card-body">
+<h3>Give a parameter a fallback value</h3>
+<details class="predict"><summary>🔮 We didn't give this function anything at all — will it error, or does it have a fallback?</summary><div class="reveal">
+<pre>def greet(name="Student"):
+    print("Hello", name)
+
+greet()
+
+<span class="out">Hello Student</span></pre>
+</div></details>
+<p>But you can still provide a value, and it replaces the default:</p>
+<pre>greet("Asha")
+
+<span class="out">Hello Asha</span></pre>
+<div class="mental">Argument provided?
+       │
+   ┌───┴───┐
+  Yes      No
+   ↓        ↓
+Use given  Use default
+ value      value</div>
+<p>Default arguments make functions more flexible:</p>
+<details class="predict"><summary>🔮 Only one value is given, but the function needs two. What fills in the gap?</summary><div class="reveal">
+<pre>def power(number, exponent=2):
+    return number ** exponent
+
+print(power(5))
+
+<span class="out">25</span></pre>
+<pre>print(power(5, 3))
+
+<span class="out">125</span></pre>
+<p>The default exponent (2) fills the gap when it isn't supplied; a provided argument always replaces the default.</p>
+</div></details>
+<div class="takeaway"><span class="label">✅ Takeaway</span>A default argument (<code>name="Student"</code>) is used automatically when no value is supplied, but any value you do pass in overrides it.</div>
+</div></div>
+
+<div class="card">
+<div class="card-tab" style="background:var(--tab-red)">13 · keyword arguments</div><div class="card-body">
+<h3>Matching by name instead of position</h3>
+<p>So far, arguments were supplied by position. You can also name the parameter you're filling in:</p>
+<pre>def introduce(name, age):
+    print(name, age)
+
+introduce(name="Asha", age=20)</pre>
+<details class="predict"><summary>🔮 The order looks flipped compared to the definition — will Python still match them correctly, or will name and age get swapped?</summary><div class="reveal">
+<pre>introduce(age=20, name="Asha")</pre>
+<p>Still correct — because keyword arguments are matched by <strong>name</strong>, not position, Python knows exactly which value belongs to which parameter regardless of order.</p>
+</div></details>
+<table><tr><th>Positional</th><th>Keyword</th></tr>
+<tr><td><code>introduce("Asha", 20)</code> — matched by order</td><td><code>introduce(name="Asha", age=20)</code> — matched by name</td></tr>
+</table>
+<p>The two can also combine with defaults:</p>
+<pre>def greet(name, message="Welcome"):
+    print(message, name)
+
+greet("Asha")
+greet("Asha", "Good morning")
+greet(name="Asha", message="Good evening")
+
+<span class="out">Welcome Asha
+Good morning Asha
+Good evening Asha</span></pre>
+<div class="takeaway"><span class="label">✅ Takeaway</span>Positional arguments depend on order; keyword arguments depend on parameter names — and the two can be mixed with default arguments.</div>
+</div></div>
+
+<div class="card">
+<div class="card-tab" style="background:var(--tab-teal)">14 · lambda functions</div><div class="card-body">
+<h3>A compact way to write a small function</h3>
+<p>Python also lets you create very small functions in a single line — these are <strong>lambda</strong> functions:</p>
+<details class="predict"><summary>🔮 This function is just one expression: <code>return x * x</code>. Does Python have a shorter way to write something this small?</summary><div class="reveal">
+<pre>def square(x):
+    return x * x
+
+square = lambda x: x * x
+
+print(square(5))
+
+<span class="out">25</span></pre>
+</div></details>
+<div class="mental">lambda
+   ↓
+Create a small anonymous function
+
+   x
+   ↓
+Parameter
+
+   :
+   ↓
+Separates parameter from expression
+
+ x * x
+   ↓
+Expression/result</div>
+<details class="predict"><summary>🔮 Predict the output before revealing</summary><div class="reveal">
+<pre>add = lambda a, b: a + b
+
+print(add(10, 20))
+
+<span class="out">30</span></pre>
+</div></details>
+<table><tr><th>Normal function (<code>def</code>)</th><th>Lambda</th></tr>
+<tr><td>Can contain multiple statements</td><td>Designed for a single expression</td></tr>
+<tr><td>Usually easier to read for larger logic</td><td>Useful for short functions</td></tr>
+<tr><td>Can have a descriptive function name</td><td>Often used for short, temporary operations</td></tr>
+</table>
+<div class="note"><span class="label">🤖 AI moment</span>Once you have both a <code>def</code> and a <code>lambda</code> version of <code>square</code>, ask an AI assistant: <em>"When would a professional Python developer actually choose one over the other?"</em> Then try rewriting the even/odd checker from the practice section below as a lambda, and judge for yourself whether it's actually more readable than the <code>def</code> version.</div>
+<div class="takeaway"><span class="label">✅ Takeaway</span>Use lambda mainly for small, simple functions where a full <code>def</code> would be unnecessary. For larger or more complex logic, a normal function is usually clearer.</div>
+</div></div>
+
+<div class="card">
+<div class="card-tab" style="background:var(--tab-mustard)">15 · putting it together</div><div class="card-body">
+<h3>Practical example: student score</h3>
+<pre>def calculate_average(score1, score2, score3):
+    total = score1 + score2 + score3
+    average = total / 3
+    return average
+
+average = calculate_average(80, 90, 70)
+print("Average:", average)
+
+<span class="out">Average: 80.0</span></pre>
+<details class="predict"><summary>🔮 Now add a condition — predict both lines of output</summary><div class="reveal">
+<pre>def check_result(average):
+    if average >= 40:
+        return "Pass"
+    else:
+        return "Fail"
+
+average = calculate_average(80, 90, 70)
+result = check_result(average)
+
+print("Average:", average)
+print("Result:", result)
+
+<span class="out">Average: 80.0
+Result: Pass</span></pre>
+</div></details>
+<p>Notice what happened: variables, operators, conditions, and functions all working together. Good programs are often built from small functions, each with one clear responsibility:</p>
+<div class="mental">            Student Program
+                    │
+        ┌───────────┼───────────┐
+        ↓           ↓           ↓
+ calculate       check       display
+ average         result       result
+        │           │           │
+        └───────────┴───────────┘
+                    ↓
+              Final Program</div>
+<div class="takeaway"><span class="label">✅ Takeaway</span>Functions let you divide a program into meaningful tasks instead of one large block of code.</div>
+</div></div>
+
+<div class="card">
+<div class="card-tab" style="background:var(--tab-red)">16 · mini practices</div><div class="card-body">
+<h3>Three problems to build yourself</h3>
+<p><strong>1. Greeting function</strong> — write a function that prints a greeting:</p>
+<pre>def greet(name):
+    ...
+
+greet("Asha")
+<span class="out">Hello Asha</span></pre>
+<p><em>Extension:</em> add a default value so <code>greet()</code> with no argument prints <code>Hello Student</code>.</p>
+
+<p><strong>2. Even or odd</strong> — write a function that reports whether a number is even:</p>
+<pre>def check_even(number):
+    ...
+
+print(check_even(10))
+<span class="out">Even</span></pre>
+<p><em>Hint:</em> use the <code>%</code> operator from the Operators class.</p>
+<details class="predict"><summary>🔮 Try it yourself, then check a possible solution</summary><div class="reveal">
+<pre>def check_even(number):
+    if number % 2 == 0:
+        return "Even"
+    else:
+        return "Odd"</pre>
+</div></details>
+
+<p><strong>3. Simple calculator</strong> — write four separate functions, one per operation:</p>
+<pre>def add(a, b): ...
+def subtract(a, b): ...
+def multiply(a, b): ...
+def divide(a, b): ...
+
+print(add(10, 5))
+print(subtract(10, 5))
+print(multiply(10, 5))
+print(divide(10, 5))</pre>
+<p>This is exactly why functions are useful — instead of one large block of code, each task gets its own function.</p>
+</div></div>
+
+<div class="card">
+<div class="card-tab" style="background:var(--tab-teal)">17 · debug clinic</div><div class="card-body">
+<h3>Two gotchas unique to functions</h3>
+
+<details class="predict"><summary>🔮 Debug 1: what does <code>message</code> actually hold here?</summary><div class="reveal">
+<pre>def greet():
+    print("Hello!")
+
+message = greet</pre>
+<p><strong>Diagnosis:</strong> notice the missing parentheses — this assigns the <em>function object itself</em> to <code>message</code>, not the result of calling it. Nothing errors, and nothing prints, because <code>greet</code> was never called. This is one of the sneakiest kinds of bug: it runs without crashing, but does the wrong thing.</p>
+<div class="note"><span class="label">🤖 AI moment</span>Write your own diagnosis first, confirm the actual (odd, non-crashing) behavior by running it, then ask an AI assistant: <em>"Why does message = greet print something like &lt;function greet at 0x...&gt; instead of running the function?"</em> Compare its explanation to your own. Then apply the fix — add the parentheses — and re-run to confirm <code>message</code> now holds the function's actual output.</p>
+</div></div></details>
+
+<details class="predict"><summary>🔮 Debug 2: why does this raise a NameError?</summary><div class="reveal">
+<pre>def calculate():
+    result = 10 + 20
+    return result
+
+calculate()
+print(result)
+
+<span class="out">NameError: name 'result' is not defined</span></pre>
+<p><strong>Diagnosis:</strong> <code>result</code> is a local variable — it exists only inside <code>calculate()</code> and disappears once the function returns. To use the value outside, capture the return: <code>result = calculate()</code>.</p>
+</div></details>
+
+<div class="note"><span class="label">Debug habit</span>Before changing code, predict what the function is doing, check whether a value was actually called or returned, then test the smallest change that could fix it.</div>
+</div></div>
+
+<div class="card">
+<div class="card-tab" style="background:var(--tab-mustard)">18 · tracing</div><div class="card-body">
+<h3>Trace before you run</h3>
+<details class="predict"><summary>🔮 What are the parameters? The arguments? The value of <code>total</code>? What does the function return? What finally prints?</summary><div class="reveal">
+<pre>def calculate(x, y):
+    total = x + y
+    return total * 2
+
+result = calculate(5, 3)
+
+print(result)</pre>
+<div class="mental">calculate(5, 3)
+       ↓
+x = 5
+y = 3
+       ↓
+total = 5 + 3
+       ↓
+total = 8
+       ↓
+return 8 * 2
+       ↓
+16
+       ↓
+result = 16
+       ↓
+print(result)
+       ↓
+16</div>
+<p><strong>Final output: 16.</strong> Parameters: <code>x, y</code>. Arguments: <code>5, 3</code>.</p>
+</div></details>
+<div class="takeaway"><span class="label">✅ Takeaway</span>Tracing a function call step by step — arguments in, body executes, value returned, then used — is a core skill for reasoning about code without always running it.</div>
+</div></div>
+
+<div class="card">
+<div class="card-tab" style="background:var(--tab-red)">19 · mini challenge</div><div class="card-body">
+<h3>Bill calculator</h3>
+<p>Create a function that calculates subtotal, calculates tax, and returns the final amount — using <code>tax=0.05</code> as a default, but allowing the caller to provide a different rate.</p>
+<pre>def calculate_bill(price, quantity, tax=0.05):
+    ...</pre>
+<pre>total = calculate_bill(100, 2)
+print(total)</pre>
+<pre>total = calculate_bill(100, 2, tax=0.10)
+print(total)</pre>
+<details class="predict"><summary>🔮 Which concepts from this class does this challenge combine?</summary><div class="reveal">
+<p>Parameters, arguments, default arguments, keyword arguments, arithmetic operators, and <code>return</code> — nearly everything from today's class in one function.</p>
+</div></details>
+</div></div>
+
+<div class="card">
+<div class="card-tab" style="background:var(--tab-teal)">20 · core mental model</div><div class="card-body">
+<h3>The one idea to leave with</h3>
+<div class="mental">              FUNCTION
+                  │
+        ┌─────────┴─────────┐
+        ↓                   ↓
+     INPUT                OUTPUT
+  parameters              return
+        │                   ↑
+        └─────────┬─────────┘
+                  ↓
+              Function
+                Logic
+                  ↓
+            Reusable Task</div>
+<div class="takeaway"><span class="label">✅ Takeaway</span>A function lets you package a task into a reusable block of code. Think: Define → Give Input → Run → Get Result — rather than just memorizing syntax.</div>
+</div></div>
+
+<div class="card">
+<div class="card-tab" style="background:var(--tab-mustard)">21 · quick revision</div><div class="card-body">
+<h3>Key terms — tap to flip</h3>
+<div class="terms-grid" id="termsGrid"></div>
+</div></div>
+
+</div>
+
+<footer>Class 5 · Functions — post-read</footer>
+
+<script>
+const resultVotes={a:0,b:0,c:0};
+function resultVote(choice){
+  if(choice==='30') resultVotes.a++;
+  else if(choice==='none') resultVotes.b++;
+  else resultVotes.c++;
+  document.getElementById('resultTally').textContent=`Votes — 30: ${resultVotes.a}, None: ${resultVotes.b}, Error: ${resultVotes.c}`;
+  document.getElementById('resultResult').classList.add('show');
+}
+const terms=[
+['function','A reusable block of code designed to perform a specific task.'],
+['calling','Running a function\u2019s code by writing its name followed by ().'],
+['parameter','The variable name listed in a function\u2019s definition.'],
+['argument','The actual value supplied when a function is called.'],
+['return','Sends a value back to whoever called the function, and ends it immediately.'],
+['local variable','Created inside a function; normally only exists within that function.'],
+['global variable','Created outside any function; can be read from inside functions.'],
+['default argument','A fallback value used when no argument is supplied for that parameter.'],
+['keyword argument','An argument passed by naming its parameter, so order doesn\u2019t matter.'],
+['lambda','A small, single-expression anonymous function.']
+];
+const grid=document.getElementById('termsGrid');
+terms.forEach(([term,def])=>{
+ const el=document.createElement('div'); el.className='flip';
+ el.innerHTML=`<div class="flip-inner"><div class="flip-face flip-front">${term}</div><div class="flip-face flip-back">${def}</div></div>`;
+ el.addEventListener('click',()=>el.classList.toggle('flipped'));
+ grid.appendChild(el);
+});
+</script>
+</body>
+</html>
